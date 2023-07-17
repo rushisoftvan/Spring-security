@@ -1,5 +1,6 @@
 package com.basic.springsecurity.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,20 +11,36 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.sql.DataSource;
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
 
 
     public static final String[] PUBLIC_URL = {"/home", "/about", "/contect-us"};
     public static final String[] CUSTOMER_ROLE_URL = {"/checkbalance", "/accountInfo"};
 
+    private  final DataSource dataSource;
+
     //this for Authentication
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+        /*  This is inmemoryAuthenticatio it not Recommended it use only for testing
         auth.inMemoryAuthentication()
                 .withUser("abc").password("$2a$10$utJiiLVM32Gfvw9SeETZiOOZi4PcioFOiJbXW7GXqiAeL9wD10zlK").authorities("ROLE_ADMIN")//abc123
                 .and().withUser("def").password("$2a$10$gFohvIQXlvNnFlkyev6xH.A7FChD5wElgr2Y/E2FZqFXr4p91BUrm").authorities("ROLE_CUSTOMER")//def123
                 .and().passwordEncoder(passwordEncoder());
+
+         */
+
+        auth.jdbcAuthentication()
+                .dataSource(dataSource).usersByUsernameQuery("select username,password,enabled from users where username=?")
+                .authoritiesByUsernameQuery("select username,role from users where username=?")
+                .passwordEncoder(passwordEncoder());
+
     }
 
     //this for authorization
@@ -49,9 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(PUBLIC_URL).permitAll()//every one can access
 
                 // hasAutority means authenticated and Role also match
-                .antMatchers("/banksetting").hasAuthority("ROLE_ADMIN")//has authority for Role// logine + role-ROLE_ADMIN
-                .antMatchers(CUSTOMER_ROLE_URL).hasAuthority("ROLE_CUSTOMER")//logine + role -ROLE_Customer
-                .antMatchers("/common").hasAnyAuthority("ROLE_ADMIN","ROLE_CUSTOMER")//we can give multipale role to acces common url poth caan acees(any 0ne - Customer or admin)
+                .antMatchers("/banksetting").hasAuthority("ADMIN")//has authority for Role// logine + role-ROLE_ADMIN
+                .antMatchers(CUSTOMER_ROLE_URL).hasAuthority("CUSTOMER")//logine + role -ROLE_Customer
+                .antMatchers("/common").hasAnyAuthority("ADMIN","CUSTOMER")//we can give multipale role to acces common url poth caan acees(any 0ne - Customer or admin)
                 .anyRequest().authenticated()//autonticated people can access
                 .and()
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
@@ -63,8 +80,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //return NoOpPasswordEncoder.getInstance(); // Not  Recommended
-        return new BCryptPasswordEncoder(); // It is Recommended
+        return NoOpPasswordEncoder.getInstance(); // Not  Recommended
+        //return new BCryptPasswordEncoder(); // It is Recommended
     }
 
     /*

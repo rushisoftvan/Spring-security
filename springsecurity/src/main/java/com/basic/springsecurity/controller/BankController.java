@@ -1,5 +1,6 @@
 package com.basic.springsecurity.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class BankController {
     }
 
     @GetMapping("/contect-us")
-    public String contectUs() {
+     public String contectUs() {
         return "xyz bank contect form";
     }
 
@@ -39,6 +40,7 @@ public class BankController {
     }
 
     @GetMapping("/common")
+
     public String common(){
         return "this is for commom";
     }
