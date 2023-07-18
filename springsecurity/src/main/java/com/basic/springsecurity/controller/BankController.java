@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-
 public class BankController {
 
     @GetMapping("/home")
@@ -48,6 +47,13 @@ public class BankController {
     @GetMapping("/logout")
     public String logout(){
       return "Account is logout";
+    }
+
+    @GetMapping("/test")
+   // @PreAuthorize(value="hasAuthority('ADMIN')")
+   // @PreAuthorize(value="hasRole(ROLE_CUSTOMER')")
+    public String getPreAutorized(){
+       return "getPreAutorized";
     }
 
 }

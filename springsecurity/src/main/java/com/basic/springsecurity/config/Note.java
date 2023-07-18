@@ -33,7 +33,31 @@ public class Note {
      =====================================full code =====================================================
       PasswordEncoder(Interface)= it used  to convert password readable to unreadable format(encode).
 
+ =============================================================session 5 ==================================================================================
+                                            MR.RAGU      spring security
+                                      ---------------------
+                        Spring Security by orm framwork[DATA JPA] (USERDetailservice)
+ * multiple step in big application
 
+ 1. User Register
+ 2.user login process
+    .passwordEncoder
+ 3.Email Notification
+ 4.custom login page
+ 5.session management
+ 6.CROS or  CSRF Token
+ ====================================================================
+                                   1.User Register
+ *)Define one register page withe required input(email,pwd,role)
+   we can even  add extra input like gender ,address,Mobile,
+ *)this data(Form data) must be converted to one model class object(User class)
+ *)same object (User object) must be store in db table
+
+application.properties
+database information
+spring.jpa.show-sql=true
+Note Dialect is class which convert our database operation(save,delete,merge,periset) to the database  query
 
      */
+
 }

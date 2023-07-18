@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,14 +17,15 @@ import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
+  private final UserDetailsService userDetailsService;
 
     public static final String[] PUBLIC_URL = {"/home", "/about", "/contect-us"};
     public static final String[] CUSTOMER_ROLE_URL = {"/checkbalance", "/accountInfo"};
 
-    private  final DataSource dataSource;
+    //private  final DataSource dataSource;
 
     //this for Authentication
     @Override
@@ -36,11 +39,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
          */
 
-        auth.jdbcAuthentication()
-                .dataSource(dataSource).usersByUsernameQuery("select username,password,enabled from users where username=?")
+       /* auth.jdbcAuthentication()
+                //create database connection
+                .dataSource(dataSource).
+                //fetch un/pass,enabled using username
+                usersByUsernameQuery("select username,password,enabled from users where username=?")
+                // fetch username,role
                 .authoritiesByUsernameQuery("select username,role from users where username=?")
+                //private password encoder reference
                 .passwordEncoder(passwordEncoder());
-
+          */
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     //this for authorization
@@ -94,10 +103,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
 
          //Login Form details
-
+              formLogin()
+              .defaultLogin()
+              .defaultSuceesUrl("/welcome",true)
          //Locaout Details
           .and().logout().
-          logoutRequestMatcher(new AntPatchRequestMatcher"/logoutMacher")
+          logoutRequestMatcher(new AntPatchRequestMatcher("/logoutMacher"))
 
          //ExceptionDetails
          and().exceptionHandling().
