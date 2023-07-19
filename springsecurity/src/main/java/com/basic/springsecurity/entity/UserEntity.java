@@ -8,6 +8,7 @@ import javax.persistence.*;
       @Entity
       @Getter
       @Setter
+      @Table(name = "users")
     public class UserEntity {
         @Id
         @Column(name = "user_id")

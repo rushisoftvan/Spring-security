@@ -68,7 +68,7 @@ Note :  JWT concept come in the stateless Authentication
    Genereted token can be read by the secret key
 
    This genereted token send to client machine using response
-   client hase to send token using request in header or body for 2nd reqquest
+   client has to send token using request in header or body for 2nd reqquest
    Token is valid onely for a period of time
 
    state means - Data of client storeed in server
@@ -122,9 +122,15 @@ Ex Token format
 
 
    Payload Contains : client Details, provider information expDate
+   HMAC - HASBASEDMESSAGE AUTHENTICATION CODE
+
+
 ==================================================================================================================
   a. Generate Token using jwt java api
   b. Read and validate token using jwt api
+      Claims - Read/Parse JWT Details By providing to input
+              1) Secret key
+              2) Token
 
  JJWT - JAVA JWT Api is open sourse java api we need to add this dependency
  <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
@@ -139,23 +145,100 @@ public class Test
 
 public static void main(String [] args){
 
+     String secretKey="NIT" we should never share the secret key
+
+
   //token generation
-    Jwts.builder().
-    setId()
-    .setSuobject()
-    .setIssure()
-    . setIssueDate()
-    .setExpiration()
+    String token =Jwts.builder().
+    setId("A2566")  //id
+    .setSuobject("Ajay")  //subject
+    .setIssure("Rushikesh")  // proider
+    . setIssueDate(new Date(System.out.currentTimeMilles))  // token generation date
+    .setExpiration(new Date(System.out.curruntTimeMilles()+TimeUnit.Minute.toMilliS(10)))// valid unit
+    .signWith(SignatureAlgoridham.HS256,Base64.getEncoder().encode(key.getBytes())) //secretKey.getBytes() Sign Alogritdham
+    .compact();
+
+       System.out.println(token);
+
+
+
+  -------------------------------------------Reading Token/Parsing token-------------------
+
+              It return format of claims c =
+                    claims c =  Jwts.parser()//meansReading
+                     .setSigningKey(Base64.getEncoder().encode(key.getBytes()))        //secret key
+                     .parsClaimsJws(token)
+                     .getBody();
+
+                     System.out.println(c.getId());
+                     System.out.println(c.getStudent());
+                      System.out.println(c.getExpiration());
+                      System.out.println(c.getIssure());
+
+
+
+                      public String getSubject(){
+
+                      }
+
+                      public boolean isValidateToken()
+                      {
+                        //expDate>current date
+                        return getClaims(key,token).getExpiration().after(new Date(System. curruntMilies()))
+                      }
 
 }
 
 }
 
+--------------------------------------------------------------------------------------------------------------------------
+                                   Spring boot using jwt
+ Preq :
+ REST
+ DATAJPA
+ JWT
+ SECURITY
+Stage #1 USER/Client Register Process
+Stage #2 JwtUtil class code
+Stage #3 JWTToken generation without Security(Testing )
+stage #4 JWT Token after user Authentication
+stage #5 JWT Token Verification from 2nd request onwards
 
+*********************************************************************************************************
+                                        Stage #1 USER/Client Register Process
+*********************************************************************************************************
 
+Model class : user(id,name,username, password,roles)
+*) client has to send  above details in json format that will be converted to user object and
+    then save in database.
 
+------codefile------
+1.application.properties
+2.create entity class UserEntity
+3.UserRepository
+4.IUserservice layer
+5.UserSerbiceImp
+6.userController
 
+*********************************************************************************************************
+                                        Stage #2JwtUtil class code
+*********************************************************************************************************
 
+JAVA JWT API : JJWT dependency
+      a) generate Token using subject
+      b) Validate Token with username,tokensubject and expdate
+**********************************************************************************************************
+                                        Stage #3 JWTToken generation without Security(Testing )
+*********************************************************************************************************
+
+     HttpRequest
+     post/user/login
+     content_type:application/json
+     body
+     {
+        username :"",
+        password :"",
+     }
 
                  */
 }
