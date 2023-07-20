@@ -208,7 +208,7 @@ stage #5 JWT Token Verification from 2nd request onwards
                                         Stage #1 USER/Client Register Process
 *********************************************************************************************************
 
-Model class : user(id,name,username, password,roles)
+6) Model class : user(id,name,username, password,roles)
 *) client has to send  above details in json format that will be converted to user object and
     then save in database.
 
@@ -223,7 +223,7 @@ Model class : user(id,name,username, password,roles)
 *********************************************************************************************************
                                         Stage #2JwtUtil class code
 *********************************************************************************************************
-
+7.
 JAVA JWT API : JJWT dependency
       a) generate Token using subject
       b) Validate Token with username,tokensubject and expdate
@@ -231,6 +231,10 @@ JAVA JWT API : JJWT dependency
                                         Stage #3 JWTToken generation without Security(Testing )
 *********************************************************************************************************
 
+Read user name and password as json format ,convert to user request object
+validate with  database rows
+Genereate  Token and  define one message, return this data in json format
+using userResponse
      HttpRequest
      post/user/login
      content_type:application/json
@@ -240,5 +244,80 @@ JAVA JWT API : JJWT dependency
         password :"",
      }
 
+
+  8.UserRequest(HttpRequest request json)
+  9.UserResponse(httpresponse Json data)
+  10. User Controller loginusermethod
+
+  got token in practise
+  eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMjMiLCJzdWIiOiJydXNoaWtlc2giLCJpc3MiOiJzYWNoaW4iLCJpYXQiOjE2ODk3NjI3NjMsImV4cCI6MTY4OTc2MzM2M30.BNbiCxYaaZMPQvTLdfxxjS8BRyzC-44BmqbOIUlQmec
+       header.payload.signature
+
+
+
+**********************************************************************************************************
+                           Stage #4 JWT Token generation after user Authentication
+***********************************************************************************************************
+11. AppConfig : Define PasswordEncoder and use before password encoder
+            Modify code in userservice imp for save user
+
+12.SecurityConfig :
+userDetailService(lodeuserbyusername)
+authenticationeentrypoint(optional)
+.public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+		http.csrf().disable()
+		.authorizeRequests().antMatchers("/user/save", "/user/login").permitAll()
+		.anyRequest().authenticated()
+		.and()
+		.exceptionHandling()
+		.authenticationEntryPoint(authenticationEntryPoint)
+		.and()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+		//To do
+		.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+
+		//ToDO : verify user for 2nd request onwards
+*****  Note : Authentication manager (check username and password ) incase of session  here no session , check should be mannuel
+         so we have to create bean of Authentication manage
+		return http.build();
+
+
+	}
+	13.usercontroller in login user we have to use Authentication manager to  Authenticate
+        authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+						userRequest.getUsername(),
+						userRequest.getPassword()
+						)
+				);
+       User  Authentication manager and validate username and password as Token
+             [UserNamePasswprdAuto]
+
+             If It is valid Jwt token is generated
+             else : Autotication Entry point is trigger
+
                  */
+    /*
+        create user
+
+
+
+ * *************************************************************************************************************
+                            stage #5 JWT Token Verification from 2nd request onwards
+  ************************************************************************************************************
+
+
+  OncePerRequestFilter
+  //read and valid token from authorization header
+  *)Define one filter which gets executed for every request.
+    if request having a authorization header, then validate using JWT UTil
+
+    if valid then create Authotication inside  securitycontext.
+
+
+    => user OncePerRequestFilter
+
+
+
+     */
 }

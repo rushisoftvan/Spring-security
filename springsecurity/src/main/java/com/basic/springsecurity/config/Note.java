@@ -60,4 +60,10 @@ Note Dialect is class which convert our database operation(save,delete,merge,per
 
      */
 
+
+    /*
+        when login client it data will go to userdetaile service there is one method whic communicate wih dataase
+
+
+     */
 }
